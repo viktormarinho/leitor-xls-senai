@@ -2,9 +2,13 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
 import datetime
+import json
 
 WEEK_DAYS = ("Segunda", "Terça", "Quarta", "Quinta", "Sexta", "\033[31mSábado", "\033[31mDomingo")
 MAT_1DS = ("HARE", "SOP", "FPOO", "FPOO", "LIMA", "\033[31mERRO!!!", "\033[31mERRO!!!")
+
+
+array_escolhido = MAT_1DS
 root = tk.Tk()
 root.withdraw()
 
@@ -19,7 +23,7 @@ csv = pd.read_csv(r'output.csv')
 dados = {
     'nome': [],
     'faltas': [],
-    'data': []
+    'falta_por_aula': [],
 }
 
 row = 0
@@ -28,6 +32,7 @@ datas = []
 first = True
 nome_aluno = ''
 total_faltas = 0
+alunos = -1
 
 while True:
     try:
@@ -36,6 +41,13 @@ while True:
         if first:
             nome_aluno = nome_atual
             dados['nome'].append(nome_aluno)
+            alunos += 1
+            aulas_dict = {}
+            for i in range(5):
+                aulas_dict[array_escolhido[i]] = 0
+            dados['falta_por_aula'].append(aulas_dict.copy())
+            aulas_dict.clear()
+
             first = False
         if nome_atual == nome_aluno:
             faltas_aluno.append(linha.NumeroFaltas)
@@ -46,16 +58,22 @@ while True:
             ano = int(datastring[4:])
             dataobj = datetime.date(ano, mes, dia)
             diasemana = dataobj.weekday()
-            diasemanastr = WEEK_DAYS[diasemana]
-            datas.append(diasemanastr)
+            diasemanastr = array_escolhido[diasemana]
+
+            dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
         else:
             dados['faltas'].append(sum(faltas_aluno))
-            dados['data'].append(datas[:])
             datas.clear()
             faltas_aluno.clear()
             total_faltas = 0
             nome_aluno = nome_atual
             dados['nome'].append(nome_aluno)
+            alunos += 1
+            aulas_dict = {}
+            for i in range(5):
+                aulas_dict[array_escolhido[i]] = 0
+            dados['falta_por_aula'].append(aulas_dict.copy())
+            aulas_dict.clear()
             faltas_aluno.append(linha.NumeroFaltas)
             datastring = linha.DataAula
             datastring = datastring.replace('/', '')
@@ -64,18 +82,20 @@ while True:
             ano = int(datastring[4:])
             dataobj = datetime.date(ano, mes, dia)
             diasemana = dataobj.weekday()
-            diasemanastr = WEEK_DAYS[diasemana]
-            datas.append(diasemanastr)
+            diasemanastr = array_escolhido[diasemana]
+
+            dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
 
         row += 1
     except KeyError:
         dados['faltas'].append(sum(faltas_aluno))
-        dados['data'].append(datas[:])
+
         break
 
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 tabela = pd.DataFrame(dados)
+
 
 #tabela = pd.DataFrame.from_dict(dados, orient='index')
 #tabela = tabela.transpose()
