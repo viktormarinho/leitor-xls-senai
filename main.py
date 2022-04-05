@@ -4,11 +4,38 @@ from tkinter import filedialog
 import datetime
 import json
 
-WEEK_DAYS = ("Segunda", "Terça", "Quarta", "Quinta", "Sexta", "\033[31mSábado", "\033[31mDomingo")
-MAT_1DS = ("HARE", "SOP", "FPOO", "FPOO", "LIMA", "\033[31mERRO!!!", "\033[31mERRO!!!")
+array_escolhido = []
 
 
-array_escolhido = MAT_1DS
+def main():
+    global array_escolhido
+    dia = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
+
+    print("***" * 15)
+    escolhas = []
+    with open('grades.json', 'r', encoding='utf-8') as f:
+        grades_json = json.load(f)
+        for grade in grades_json.keys():
+            escolhas.append(grade)
+    count = 0
+    for gr_nome, gr_lista in grades_json.items():
+        print(f'{count} - {gr_nome}: {gr_lista}')
+        count += 1
+    cod = int(input("codigo (-1 adiciona): "))
+    if cod == -1:
+        nome = input("Nome da grade: ")
+        materias = [input(f"Materia do dia {dia[i]}:") for i in range(5)]
+        materias.append("ERRO!!!")
+        materias.append("ERRO!!!")
+        grades_json[nome] = materias
+        with open('grades.json', 'w', encoding='utf-8') as f:
+            json.dump(grades_json, f)
+        main()
+    else:
+        array_escolhido = grades_json[escolhas[cod]]
+        start()
+
+
 root = tk.Tk()
 root.withdraw()
 
@@ -59,41 +86,47 @@ def novo_aluno(aluno_nome):
     aulas_dict.clear()
 
 
-while True:
-    try:
-        linha = csv.loc[row]
-        nome_atual = linha.NomeAluno
-        if first:
-            nome_aluno = nome_atual
-            novo_aluno(nome_aluno)
-            first = False
-        if nome_atual == nome_aluno:
+def start():
+    global row, first, nome_aluno
+    while True:
+        try:
+            linha = csv.loc[row]
+            nome_atual = linha.NomeAluno
+            if first:
+                nome_aluno = nome_atual
+                novo_aluno(nome_aluno)
+                first = False
+            if nome_atual == nome_aluno:
 
-            computar_linha(linha)
-        else:
+                computar_linha(linha)
+            else:
+                dados['faltas'].append(sum(faltas_aluno))
+                datas.clear()
+                faltas_aluno.clear()
+                nome_aluno = nome_atual
+
+                novo_aluno(nome_aluno)
+
+                computar_linha(linha)
+
+            row += 1
+        except KeyError:
+            # ACHO QUE TEM COISA ERRADA AQUI QSE CERTEZA, CONFERIR RACIOCINIO
+            # Checar mexendo nas últimas linhas do csv para ver se ele computa as últimas faltas.
             dados['faltas'].append(sum(faltas_aluno))
-            datas.clear()
-            faltas_aluno.clear()
-            nome_aluno = nome_atual
 
-            novo_aluno(nome_aluno)
+            break
 
-            computar_linha(linha)
-
-        row += 1
-    except KeyError:
-        # ACHO QUE TEM COISA ERRADA AQUI QSE CERTEZA, CONFERIR RACIOCINIO
-        # Checar mexendo nas últimas linhas do csv para ver se ele computa as últimas faltas.
-        dados['faltas'].append(sum(faltas_aluno))
-
-        break
-
-pd.set_option('display.width', None)
-pd.set_option('display.max_colwidth', None)
-tabela = pd.DataFrame(dados)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
+    tabela = pd.DataFrame(dados)
 
 
-#tabela = pd.DataFrame.from_dict(dados, orient='index')
-#tabela = tabela.transpose()
+    #tabela = pd.DataFrame.from_dict(dados, orient='index')
+    #tabela = tabela.transpose()
 
-print(tabela)
+    print(tabela)
+
+
+if __name__ == '__main__':
+    main()
