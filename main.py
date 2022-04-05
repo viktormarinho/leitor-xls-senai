@@ -31,8 +31,33 @@ faltas_aluno = []
 datas = []
 first = True
 nome_aluno = ''
-total_faltas = 0
 alunos = -1
+
+
+def computar_linha(linha):
+    faltas_aluno.append(linha.NumeroFaltas)
+    datastring = linha.DataAula
+    datastring = datastring.replace('/', '')
+    dia = int(datastring[0:2])
+    mes = int(datastring[2:4])
+    ano = int(datastring[4:])
+    dataobj = datetime.date(ano, mes, dia)
+    diasemana = dataobj.weekday()
+    diasemanastr = array_escolhido[diasemana]
+
+    dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
+
+
+def novo_aluno(aluno_nome):
+    global alunos
+    dados['nome'].append(aluno_nome)
+    alunos += 1
+    aulas_dict = {}
+    for j in range(5):
+        aulas_dict[array_escolhido[j]] = 0
+    dados['falta_por_aula'].append(aulas_dict.copy())
+    aulas_dict.clear()
+
 
 while True:
     try:
@@ -40,54 +65,25 @@ while True:
         nome_atual = linha.NomeAluno
         if first:
             nome_aluno = nome_atual
-            dados['nome'].append(nome_aluno)
-            alunos += 1
-            aulas_dict = {}
-            for i in range(5):
-                aulas_dict[array_escolhido[i]] = 0
-            dados['falta_por_aula'].append(aulas_dict.copy())
-            aulas_dict.clear()
-
+            novo_aluno(nome_aluno)
             first = False
         if nome_atual == nome_aluno:
-            faltas_aluno.append(linha.NumeroFaltas)
-            datastring = linha.DataAula
-            datastring = datastring.replace('/', '')
-            dia = int(datastring[0:2])
-            mes = int(datastring[2:4])
-            ano = int(datastring[4:])
-            dataobj = datetime.date(ano, mes, dia)
-            diasemana = dataobj.weekday()
-            diasemanastr = array_escolhido[diasemana]
 
-            dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
+            computar_linha(linha)
         else:
             dados['faltas'].append(sum(faltas_aluno))
             datas.clear()
             faltas_aluno.clear()
-            total_faltas = 0
             nome_aluno = nome_atual
-            dados['nome'].append(nome_aluno)
-            alunos += 1
-            aulas_dict = {}
-            for i in range(5):
-                aulas_dict[array_escolhido[i]] = 0
-            dados['falta_por_aula'].append(aulas_dict.copy())
-            aulas_dict.clear()
-            faltas_aluno.append(linha.NumeroFaltas)
-            datastring = linha.DataAula
-            datastring = datastring.replace('/', '')
-            dia = int(datastring[0:2])
-            mes = int(datastring[2:4])
-            ano = int(datastring[4:])
-            dataobj = datetime.date(ano, mes, dia)
-            diasemana = dataobj.weekday()
-            diasemanastr = array_escolhido[diasemana]
 
-            dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
+            novo_aluno(nome_aluno)
+
+            computar_linha(linha)
 
         row += 1
     except KeyError:
+        # ACHO QUE TEM COISA ERRADA AQUI QSE CERTEZA, CONFERIR RACIOCINIO
+        # Checar mexendo nas últimas linhas do csv para ver se ele computa as últimas faltas.
         dados['faltas'].append(sum(faltas_aluno))
 
         break
