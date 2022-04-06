@@ -113,6 +113,7 @@ def start():
         except KeyError:
             # ACHO QUE TEM COISA ERRADA AQUI QSE CERTEZA, CONFERIR RACIOCINIO
             # Checar mexendo nas últimas linhas do csv para ver se ele computa as últimas faltas.
+            # Parece estar tudo certo agora... --viktor 6/04
             dados['faltas'].append(sum(faltas_aluno))
 
             break
