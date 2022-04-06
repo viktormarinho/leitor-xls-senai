@@ -6,8 +6,12 @@ import json
 
 array_escolhido = []
 
+root = tk.Tk()
+root.withdraw()
+
 
 def main():
+    csv = get_file()
     global array_escolhido
     dia = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
 
@@ -33,19 +37,16 @@ def main():
         main()
     else:
         array_escolhido = grades_json[escolhas[cod]]
-        start()
+        start(csv)
 
 
-root = tk.Tk()
-root.withdraw()
+def get_file():
+    file_path = filedialog.askopenfilename()
+    leitor = pd.read_excel(file_path)
+    leitor.to_csv(r'output.csv', index=None, header=True)
+    csv = pd.read_csv(r'output.csv')
+    return csv
 
-file_path = filedialog.askopenfilename()
-
-
-leitor = pd.read_excel(file_path)
-leitor.to_csv(r'output.csv', index=None, header=True)
-
-csv = pd.read_csv(r'output.csv')
 
 dados = {
     'nome': [],
@@ -53,15 +54,8 @@ dados = {
     'falta_por_aula': [],
 }
 
-row = 0
-faltas_aluno = []
-datas = []
-first = True
-nome_aluno = ''
-alunos = -1
 
-
-def computar_linha(linha):
+def computar_linha(linha, alunos, faltas_aluno):
     faltas_aluno.append(linha.NumeroFaltas)
     datastring = linha.DataAula
     datastring = datastring.replace('/', '')
@@ -75,8 +69,7 @@ def computar_linha(linha):
     dados['falta_por_aula'][alunos][diasemanastr] += linha.NumeroFaltas
 
 
-def novo_aluno(aluno_nome):
-    global alunos
+def novo_aluno(aluno_nome, alunos):
     dados['nome'].append(aluno_nome)
     alunos += 1
     aulas_dict = {}
@@ -84,47 +77,42 @@ def novo_aluno(aluno_nome):
         aulas_dict[array_escolhido[j]] = 0
     dados['falta_por_aula'].append(aulas_dict.copy())
     aulas_dict.clear()
+    return alunos
 
 
-def start():
-    global row, first, nome_aluno
+def start(csv):
+    faltas_aluno = []
+    row = 0
+    first = True
+    nome_aluno = ''
+    alunos = -1
     while True:
         try:
             linha = csv.loc[row]
             nome_atual = linha.NomeAluno
             if first:
                 nome_aluno = nome_atual
-                novo_aluno(nome_aluno)
+                alunos = novo_aluno(nome_aluno, alunos)
                 first = False
             if nome_atual == nome_aluno:
-
-                computar_linha(linha)
+                computar_linha(linha, alunos, faltas_aluno)
             else:
                 dados['faltas'].append(sum(faltas_aluno))
-                datas.clear()
                 faltas_aluno.clear()
                 nome_aluno = nome_atual
 
-                novo_aluno(nome_aluno)
+                alunos = novo_aluno(nome_aluno, alunos)
 
-                computar_linha(linha)
+                computar_linha(linha, alunos, faltas_aluno)
 
             row += 1
         except KeyError:
-            # ACHO QUE TEM COISA ERRADA AQUI QSE CERTEZA, CONFERIR RACIOCINIO
-            # Checar mexendo nas últimas linhas do csv para ver se ele computa as últimas faltas.
-            # Parece estar tudo certo agora... --viktor 6/04
             dados['faltas'].append(sum(faltas_aluno))
-
             break
 
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', None)
     tabela = pd.DataFrame(dados)
-
-
-    #tabela = pd.DataFrame.from_dict(dados, orient='index')
-    #tabela = tabela.transpose()
 
     print(tabela)
 
