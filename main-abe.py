@@ -46,7 +46,6 @@ alunos = list(csv.drop_duplicates(subset=["NomeAluno"])["NomeAluno"])
 for aluno in alunos:
     # Obtem todos os registros do aluno
     linha_aluno = csv.loc[csv["NomeAluno"] == aluno]
-    print(linha_aluno)
     arr = list()
     dia = {"faltas": 0, "aulas": 0}
     for i in range(5):
@@ -76,5 +75,7 @@ for aluno in alunos:
         f"Faltas {selected[4]}": arr[4]["faltas"],
     }
     df = df.append(appenddata, ignore_index=True)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
 
 print(df)

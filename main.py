@@ -100,9 +100,7 @@ def start(csv):
                 dados['faltas'].append(sum(faltas_aluno))
                 faltas_aluno.clear()
                 nome_aluno = nome_atual
-
                 alunos = novo_aluno(nome_aluno, alunos)
-
                 computar_linha(linha, alunos, faltas_aluno)
 
             row += 1
