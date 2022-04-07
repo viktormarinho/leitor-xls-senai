@@ -9,7 +9,7 @@ let
     with p; [
       pandas
       tkinter
-
+      xlrd
       # other python packages you want
     ]);
 in pkgs.mkShell {
