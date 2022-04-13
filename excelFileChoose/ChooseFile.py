@@ -1,4 +1,5 @@
 from PySimpleGUI import PySimpleGUI as g
+import main
 
 class ChooseFile:
 
