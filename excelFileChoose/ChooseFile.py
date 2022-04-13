@@ -1,7 +1,6 @@
 from PySimpleGUI import PySimpleGUI as g
 from excelShowData.ShowData import ShowData as s
 import json
-
 class ChooseFile:
 
     def chooseFileWindow(self):
