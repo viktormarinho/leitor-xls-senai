@@ -78,24 +78,25 @@ def add_grade(grades_json):
 
 
 def get_grade():
-    with open('../grades.json', 'r') as read_json:
-        grades_json = json.load(read_json)
+    while True:
+        with open('../grades.json', 'r') as read_json:
+            grades_json = json.load(read_json)
 
-    grades_disponiveis = []
-    for grade in grades_json.keys():
-        grades_disponiveis.append(grade)
+        grades_disponiveis = []
+        for grade in grades_json.keys():
+            grades_disponiveis.append(grade)
 
-    print("Grades disponiveis (-1 adiciona) :")
-    for i in range(len(grades_disponiveis)):
-        print(f'{i} - {grades_disponiveis[i]}')
-    escolhido = int(input("Escolha uma: "))
-    if escolhido == -1:
-        add_grade(grades_json)
-        get_grade()
-    else:
-        selected = grades_json[grades_disponiveis[escolhido]]
-        print(selected)
-        return selected
+        print("Grades disponiveis (-1 adiciona) :")
+        for i in range(len(grades_disponiveis)):
+            print(f'{i} - {grades_disponiveis[i]}')
+        escolhido = int(input("Escolha uma: "))
+        if escolhido == -1:
+            add_grade(grades_json)
+            continue
+        else:
+            selected = grades_json[grades_disponiveis[escolhido]]
+            print(selected)
+            return selected
 
 
 def get_file():
