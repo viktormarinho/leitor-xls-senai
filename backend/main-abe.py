@@ -2,6 +2,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
 from datetime import datetime
+import json
 
 
 def main():
@@ -63,18 +64,38 @@ def main():
     print(df)
 
 
+def add_grade(grades_json):
+    semdays = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
+    aulas_dia = []
+    nome = input("Digite o nome da grade a ser adicionada: ")
+    if nome in grades_json.keys():
+        add_grade(grades_json)
+    for i in range(5):
+        aulas_dia.append(input(f'materia dia {semdays[i]} -> '))
+    grades_json[nome] = aulas_dia
+    with open('../grades.json', 'w') as f:
+        json.dump(grades_json, f)
+
+
 def get_grade():
-    semana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
-    mat_des = ["HARE", "SOP", "FPOO", "FPOO2", "LIMA"]
-    while True:
-        o = int(input("Selecione a grade que você quer usar: "))
-        if o == 1:
-            selected = semana
-            break
-        else:
-            selected = mat_des
-            break
-    return selected
+    with open('../grades.json', 'r') as read_json:
+        grades_json = json.load(read_json)
+
+    grades_disponiveis = []
+    for grade in grades_json.keys():
+        grades_disponiveis.append(grade)
+
+    print("Grades disponiveis (-1 adiciona) :")
+    for i in range(len(grades_disponiveis)):
+        print(f'{i} - {grades_disponiveis[i]}')
+    escolhido = int(input("Escolha uma: "))
+    if escolhido == -1:
+        add_grade(grades_json)
+        get_grade()
+    else:
+        selected = grades_json[grades_disponiveis[escolhido]]
+        print(selected)
+        return selected
 
 
 def get_file():
