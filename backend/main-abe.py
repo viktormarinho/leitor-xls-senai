@@ -14,11 +14,11 @@ def main():
     data_format = {
         "Nome": [],
         "Faltas": [],
-        f"Faltas {selected[0]}": [],
-        f"Faltas {selected[1]}": [],
-        f"Faltas {selected[2]}": [],
-        f"Faltas {selected[3]}": [],
-        f"Faltas {selected[4]}": [],
+        f"Faltas {selected[0]} - Seg": [],
+        f"Faltas {selected[1]} - Ter": [],
+        f"Faltas {selected[2]} - Qua": [],
+        f"Faltas {selected[3]} - Qui": [],
+        f"Faltas {selected[4]} - Sex": [],
     }
     df = pd.DataFrame(data_format)
 
@@ -50,11 +50,11 @@ def main():
         appenddata = {
             "Nome": aluno,
             "Faltas": total_faltas_aluno,
-            f"Faltas {selected[0]}": arr[0]["faltas"],
-            f"Faltas {selected[1]}": arr[1]["faltas"],
-            f"Faltas {selected[2]}": arr[2]["faltas"],
-            f"Faltas {selected[3]}": arr[3]["faltas"],
-            f"Faltas {selected[4]}": arr[4]["faltas"],
+            f"Faltas {selected[0]} - Seg": arr[0]["faltas"],
+            f"Faltas {selected[1]} - Ter": arr[1]["faltas"],
+            f"Faltas {selected[2]} - Qua": arr[2]["faltas"],
+            f"Faltas {selected[3]} - Qui": arr[3]["faltas"],
+            f"Faltas {selected[4]} - Sex": arr[4]["faltas"],
         }
         # df = df.append(appenddata, ignore_index=True)
         df = pd.concat([df, pd.DataFrame.from_records([appenddata])])
@@ -77,25 +77,51 @@ def add_grade(grades_json):
         json.dump(grades_json, f)
 
 
+def delete_grade(grades_json):
+    nome = input("Digite o nome da grade a ser deletada: ")
+    if nome not in grades_json.keys():
+        delete_grade(grades_json)
+    del grades_json[nome]
+    with open('../grades.json', 'w') as f:
+        json.dump(grades_json, f)
+
+
+def edit_grade(grades_json):
+    semdays = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
+    aulas_dia = []
+
+    nome = input("Digite o nome da grade a ser editada: ")
+    if nome not in grades_json.keys():
+        edit_grade(grades_json)
+    for i in range(5):
+        aulas_dia.append(input(f'materia dia {semdays[i]} -> '))
+    grades_json[nome] = aulas_dia
+    with open('../grades.json', 'w') as f:
+        json.dump(grades_json, f)
+
+
 def get_grade():
     while True:
         with open('../grades.json', 'r') as read_json:
             grades_json = json.load(read_json)
-
         grades_disponiveis = []
         for grade in grades_json.keys():
             grades_disponiveis.append(grade)
-
-        print("Grades disponiveis (-1 adiciona) :")
+        print("Grades disponiveis (-1 adiciona -2 deleta -3 edita) :")
         for i in range(len(grades_disponiveis)):
             print(f'{i} - {grades_disponiveis[i]}')
         escolhido = int(input("Escolha uma: "))
         if escolhido == -1:
             add_grade(grades_json)
             continue
+        elif escolhido == -2:
+            delete_grade(grades_json)
+            continue
+        elif escolhido == -3:
+            edit_grade(grades_json)
+            continue
         else:
             selected = grades_json[grades_disponiveis[escolhido]]
-            print(selected)
             return selected
 
 
