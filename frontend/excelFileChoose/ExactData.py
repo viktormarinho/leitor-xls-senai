@@ -2,11 +2,12 @@ from PySimpleGUI import PySimpleGUI as g
 
 class ExactData:
 
-    def exactDataWindow(self):
-        g.theme('Default')
+
+    def exactDataWindow(self, ALUNO_INFO):
+        g.theme('Reddit')
 
         show_Data = [
-            [g.Text("alo teste", key='-DATA-')]
+            [g.Text(ALUNO_INFO, key='-DATA-')]
         ]
 
         layout = [

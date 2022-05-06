@@ -5,11 +5,11 @@ from datetime import datetime
 import json
 
 
-def main():
+def main(FILEPATH, SELECTEDGRADE):
     root = tk.Tk()
     root.withdraw()
-    csv = get_file()
-    selected = get_grade()
+    csv = get_file(FILEPATH)
+    selected = get_grade(SELECTEDGRADE)
     # Cria tabela (dataframe) com os dados requisitados
     data_format = {
         "Nome": [],
@@ -61,7 +61,7 @@ def main():
         pd.set_option("display.width", None)
         pd.set_option("display.max_colwidth", None)
 
-    print(df)
+    return df
 
 
 def add_grade(grades_json):
@@ -73,7 +73,7 @@ def add_grade(grades_json):
     for i in range(5):
         aulas_dia.append(input(f'materia dia {semdays[i]} -> '))
     grades_json[nome] = aulas_dia
-    with open('../grades.json', 'w') as f:
+    with open('grades.json', 'w') as f:
         json.dump(grades_json, f)
 
 
@@ -82,7 +82,7 @@ def delete_grade(grades_json):
     if nome not in grades_json.keys():
         delete_grade(grades_json)
     del grades_json[nome]
-    with open('../grades.json', 'w') as f:
+    with open('grades.json', 'w') as f:
         json.dump(grades_json, f)
 
 
@@ -96,38 +96,42 @@ def edit_grade(grades_json):
     for i in range(5):
         aulas_dia.append(input(f'materia dia {semdays[i]} -> '))
     grades_json[nome] = aulas_dia
-    with open('../grades.json', 'w') as f:
+    with open('grades.json', 'w') as f:
         json.dump(grades_json, f)
 
+def get_grade(selected):
+    with open('grades.json', 'r') as f:
+        grades_json = json.load(f)
+    for k in grades_json.keys():
+        if k == selected:
+            return grades_json[k]
+#     while True:
+#         with open('grades.json', 'r') as read_json:
+#             grades_json = json.load(read_json)
+#         grades_disponiveis = []
+#         for grade in grades_json.keys():
+#             grades_disponiveis.append(grade)
+#         print("Grades disponiveis (-1 adiciona -2 deleta -3 edita) :")
+#         for i in range(len(grades_disponiveis)):
+#             print(f'{i} - {grades_disponiveis[i]}')
+#         escolhido = int(input("Escolha uma: "))
+#         if escolhido == -1:
+#             add_grade(grades_json)
+#             continue
+#         elif escolhido == -2:
+#             delete_grade(grades_json)
+#             continue
+#         elif escolhido == -3:
+#             edit_grade(grades_json)
+#             continue
+#         else:
+#             selected = grades_json[grades_disponiveis[escolhido]]
+#             return selected
 
-def get_grade():
-    while True:
-        with open('../grades.json', 'r') as read_json:
-            grades_json = json.load(read_json)
-        grades_disponiveis = []
-        for grade in grades_json.keys():
-            grades_disponiveis.append(grade)
-        print("Grades disponiveis (-1 adiciona -2 deleta -3 edita) :")
-        for i in range(len(grades_disponiveis)):
-            print(f'{i} - {grades_disponiveis[i]}')
-        escolhido = int(input("Escolha uma: "))
-        if escolhido == -1:
-            add_grade(grades_json)
-            continue
-        elif escolhido == -2:
-            delete_grade(grades_json)
-            continue
-        elif escolhido == -3:
-            edit_grade(grades_json)
-            continue
-        else:
-            selected = grades_json[grades_disponiveis[escolhido]]
-            return selected
 
-
-def get_file():
+def get_file(FILEPATH):
     # Obtem o caminho do arquivo excel e lê os dados
-    file_path = filedialog.askopenfilename()
+    file_path = FILEPATH
     # file_path = "/home/abe/ws/leitor-xls-senai-old/abe/alunos.xls"
     pd.read_excel(file_path).to_csv(r"output.csv", index=None, header=True)
     csv = pd.read_csv(
