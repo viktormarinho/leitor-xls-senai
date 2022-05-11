@@ -16,7 +16,7 @@ class ChooseFile:
         choose_File = [
             [g.FileBrowse("Procurar Arquivo", target="-FILE-", size=(25, 2))],
             [g.Text("NOME DO ARQUIVO", key="-FILE-", text_color="#595959")],
-            [g.Combo(dict_json, size=(25,0), default_value="Escolha a Grade", readonly=True), g.Button("🔄", key="-REFRESH-", size=(1,1))],
+            [g.Combo(dict_json, size=(25,0), default_value="Escolha a Grade", readonly=True), g.Button("Atualizar", key="-REFRESH-", size=(25,2))],
             [g.Button("Gerenciar Grades", key="-MANAGE-", size=(8,2)), g.Button("Confirmar", key="-CONFIRM-", size=(8,2))]
         ]
 
