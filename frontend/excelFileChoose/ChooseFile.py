@@ -6,8 +6,8 @@ import mainabe
 
 FILE_PATH: str = ""
 
-class ChooseFile:
 
+class ChooseFile:
     def chooseFileWindow(self):
         global FILE_PATH
         dict_json, Grades = self.gradesList()
@@ -17,7 +17,7 @@ class ChooseFile:
             [g.FileBrowse("Procurar Arquivo", target="-FILE-", size=(25, 2))],
             [g.Text("NOME DO ARQUIVO", key="-FILE-", text_color="#595959")],
             [g.Combo(dict_json, size=(25,0), default_value="Escolha a Grade", readonly=True), g.Button("🔄", key="-REFRESH-", size=(1,1))],
-            [g.Button("Gerenciar Grade", key="-MANAGE-", size=(8,2)), g.Button("Confirmar", key="-CONFIRM-", size=(8,2))]
+            [g.Button("Gerenciar Grades", key="-MANAGE-", size=(8,2)), g.Button("Confirmar", key="-CONFIRM-", size=(8,2))]
         ]
 
         # Panel para o menu de gerenciamento das grades. Deve ser oculto e so aparecer quando chamado

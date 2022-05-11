@@ -40,7 +40,7 @@ class AddGrade:
                     value['-SEX-'],
                 ]
                 Grades[value['-NOME-']] = aulas_dia
-                with open('grades.json', 'w') as f:
+                with open('grades.json', 'w', encoding="utf-8") as f:
                     json.dump(Grades, f)
 
                 window.close()
